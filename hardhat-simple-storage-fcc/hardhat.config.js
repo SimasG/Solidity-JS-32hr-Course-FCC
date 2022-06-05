@@ -4,6 +4,7 @@ require("@nomiclabs/hardhat-etherscan");
 // if we don't add our custom tasks to the config file, hardhat will not register them
 require("./tasks/block-number");
 require("hardhat-gas-reporter");
+require("solidity-coverage");
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -30,6 +31,7 @@ module.exports = {
     // reset each time a script is run)
     localhost: {
       url: "http://127.0.0.1:8545/",
+      // accounts are covered by hardhat here
       chainId: 31337,
     },
   },
@@ -39,10 +41,12 @@ module.exports = {
     apiKey: ETHERSCAN_API_KEY,
   },
   gasReporter: {
-    enabled: true,
+    // makes sense to switch to false when we're not optimizing for gas
+    enabled: false,
     outputFile: "gas-report.txt",
     noColors: true,
     currency: "USD",
-    coinmarketcap: COINMARKETCAP_API_KEY,
+    // since we have limited # of free API calls, makes sense not to use it all the time
+    // coinmarketcap: COINMARKETCAP_API_KEY,
   },
 };

@@ -27,4 +27,18 @@ describe("SimpleStorage", function () {
 
     assert.equal(updatedValue.toString(), expectedValue);
   });
+
+  //**trying to create a test for the addPerson func
+  // it("Should have favorite number = 10 and name = Simas", async function () {
+  //   const expectedFavoriteNumber = "10";
+  //   const expectedName = "Simas";
+  //   const transactionResponse = await simpleStorage.addPerson("Simas", "10");
+  //   await transactionResponse.wait(1);
+
+  //   const name = await simpleStorage.people[0].name;
+  //   const favoriteNumber = await simpleStorage.people[0].favoriteNumber;
+
+  //   assert.equal(name, expectedName);
+  //   assert.equal(favoriteNumber.toString(), expectedFavoriteNumber);
+  // });
 });
