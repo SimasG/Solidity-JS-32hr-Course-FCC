@@ -1,32 +1,29 @@
-const ethers = require("ethers");
-// not sure how "fs" is used here
-const fs = require("fs-extra");
+import { ethers } from "ethers";
+// "fs-extra" helps us read our .abi & .bin files
+import * as fs from "fs-extra";
+import "dotenv/config";
 
 async function main() {
-  // will be making API calls to this endpoint: http://127.0.0.1:7545
   // connecting to our local Ganache blockchain
-  const provider = new ethers.providers.JsonRpcProvider(
-    "http://127.0.0.1:7545"
-  );
+  let provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL!);
   // connecting a wallet from Ganache with a private key
-  const wallet = new ethers.Wallet(
-    "4071393d74c93204040735076ca1a25b4818a980896186fdcaadbc0258443ff5",
-    provider
-  );
-  //   reading abi & binary
+  let wallet = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+  // reading abi & binary
   const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8"); // "utf8" is the encoding
   const binary = fs.readFileSync(
     "./SimpleStorage_sol_SimpleStorage.bin",
     "utf8"
   );
 
-  //   **SENDING A "RAW" TRANSACTION OURSELVES WITH ONLY TX DATA
-  //   nonce is a unique number used to identify each transaction. One way to dynamically get a
+  // **SENDING A "RAW" TRANSACTION OURSELVES WITH ONLY TX DATA
+  // nonce is a unique number used to identify each transaction. One way to dynamically get a
   // unique number is to use the # of transactions made as the current nonce
-  //   const nonce = await wallet.getTransactionCount();
+  console.log("deploying with only transaction data...");
+  const nonce = await wallet.getTransactionCount();
 
-  //   giving raw specs for the transaction
-  const tx = {
+  // giving raw specs for the transaction
+  // ** Not happy with "any"
+  const tx: any = {
     nonce: nonce,
     // do we have to specify the gas price manually because we're on a fake blockchain (Ganache)?
     gasPrice: 20000000000,
@@ -39,14 +36,16 @@ async function main() {
     chainId: 1337,
   };
 
-  //   sending (& automatically signing) the transaction
+  // Just signing the transaction
+  // const signedTxResponse = await wallet.signTransaction(tx);
+
+  // sending (& automatically signing) the transaction
   const sentTxResponse = await wallet.sendTransaction(tx);
-  //   waiting for 1 block confirmation after our block
+  // waiting for 1 block confirmation after our block
   await sentTxResponse.wait(1);
   console.log(sentTxResponse);
 }
 
-// "process.exit" is confusing
 main()
   .then(() => process.exit(0))
   .catch((error) => {
