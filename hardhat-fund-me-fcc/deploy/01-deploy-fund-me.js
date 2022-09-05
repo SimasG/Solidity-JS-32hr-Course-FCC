@@ -23,7 +23,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const ethUsdAggregator = await deployments.get("MockV3Aggregator");
     ethUsdPriceFeedAddress = ethUsdAggregator.address;
   } else {
-    ethUsdPriceFeedAddress = networkConfig.chainId.ethUsdPriceFeed;
+    // ethUsdPriceFeedAddress = networkConfig.chainId.ethUsdPriceFeed;
+    ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"];
   }
 
   // **mock
@@ -37,6 +38,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     from: deployer,
     args: args,
     log: true,
+    // the # of block confirmations before we take further action (in our case -> check whether
+    // to verify the contract)
+    waitConfirmations: network.config.blockConfirmations || 1,
   });
 
   // **checking if we should verify the contract (yes if we use test/mainnet, no if we use local env)

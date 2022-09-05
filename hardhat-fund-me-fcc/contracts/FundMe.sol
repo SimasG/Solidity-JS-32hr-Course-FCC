@@ -3,17 +3,38 @@
 // 2. withdraw funds
 // 3. set minimum funding value in USD
 
+// **0. License Identifier
 // SPDX-License-Identifier: MIT
 
+// **1. Pragma
 pragma solidity ^0.8.8;
 
+// **2. Imports
+import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./PriceConverter.sol";
 
+// **3. Error Codes
+// error FundMe__NotOwner();
+
+// **4. Libraries
+
+// **5. Interfaces
+
+// **6. Contracts
+
+// Using NatSpec  documentation convention
+/** @title A contract for crowd funding
+ *  @author Simas Gradeckas
+ *  @notice This contract is to demo a sample funding contract
+ *  @dev This implements price feeds as our library
+ */
 contract FundMe {
+    // ** 6.1 Type Declarations
     // this allows using functions in PriceConverter like methods for
     // uint256 vars (e.g. msg.value.getConversionRate)
     using PriceConverter for uint256;
 
+    // ** 6.2 State Variables
     // post on github discussions why do we need to multiply it by 1e18
     // "constant" prevents the var from being changed -> costs less gas
     uint256 public constant MINIMUM_USD = 50 * 1e18;
@@ -32,6 +53,19 @@ contract FundMe {
 
     AggregatorV3Interface public priceFeed;
 
+    // **6.3 Events
+    // **6.4 Modifiers
+    // reusing code in different functions
+    modifier onlyOwner() {
+        require(msg.sender == i_owner, "Sender is not owner!");
+        // if (msg.sender != owner revert FundMe__NotOwner())
+        // specifying that we want to run the function code only after
+        // checking the require condition
+        _;
+    }
+
+    // **6.5 Functions
+    // **6.5.1 Contructors
     // constructor gets automatically run each time a contract is deployed
     // and called?
     constructor(address priceFeedAddress) {
@@ -40,6 +74,23 @@ contract FundMe {
         priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
+    // **6.5.2 Receive
+    receive() external payable {
+        fund();
+    }
+
+    // **6.5.3 Fallback
+    fallback() external payable {
+        fund();
+    }
+
+    // **6.5.4 External
+    // **6.5.5 Public
+
+    /**
+     *  @notice This function funds this contract
+     *  @dev This implements price feeds as our library
+     */
     // "payable" implies that value will be sent in this function
     function fund() public payable {
         // "msg.value" is a number of wei sent in the transaction
@@ -70,19 +121,6 @@ contract FundMe {
         // resetting the funders array by creating a new array with 0 items
         funders = new address[](0);
 
-        // actually withdrawing the funds. there are 3 methds:
-        // // 1. Transfer
-        // // changing the data type from address to payable address
-        // // we can only make transactions with payable address data types
-        // payable(msg.sender).transfer(address(this).balance);
-
-        // // 2. Send
-        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
-        // // we have to add the "require" because "send" doesn't throw errors if
-        // // unsuccessful. instead if returns a boolean
-        // // if sendSuccess = false, throw error "Send failed!";
-        // require(sendSuccess, "Send failed!");
-
         // 3. Call
         // with "call", we can both value AND calldata "("")"
         (bool callSuccess, ) = payable(msg.sender).call{
@@ -91,22 +129,10 @@ contract FundMe {
         require(callSuccess, "Call failed!");
     }
 
-    // reusing code in different functions
-    modifier onlyOwner() {
-        require(msg.sender == i_owner, "Sender is not owner!");
-        // specifying that we want to run the function code only after
-        // checking the require condition
-        _;
-    }
+    // **6.5.6 Internal
+    // **6.5.7 Private
+    // **6.5.8 View/Pure
 
     // What happens if someone sends this contract ETH
     // without calling the fund func?
-
-    receive() external payable {
-        fund();
-    }
-
-    fallback() external payable {
-        fund();
-    }
 }

@@ -1,0 +1,41 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/FundMe.sol": {
+      "content": "// A contract that can receive ETH and withdraw it (no sending it to other though)\n// 1. get funds from users\n// 2. withdraw funds\n// 3. set minimum funding value in USD\n\n// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.8;\n\nimport \"./PriceConverter.sol\";\n\ncontract FundMe {\n    // this allows using functions in PriceConverter like methods for\n    // uint256 vars (e.g. msg.value.getConversionRate)\n    using PriceConverter for uint256;\n\n    // post on github discussions why do we need to multiply it by 1e18\n    // \"constant\" prevents the var from being changed -> costs less gas\n    uint256 public constant MINIMUM_USD = 50 * 1e18;\n\n    // keeping track of all funders by making an array of their addresses\n    // strictly addresses since that is the data type we specified\n    address[] public funders;\n\n    // connecting address with the amount funded so we could track\n    // which address sent how much\n    mapping(address => uint256) public addressToAmountFunded;\n\n    // \"immutable\" makes the var read-only (like \"constant\")\n    // but assignable in the constructor -> costs less gass\n    address public immutable i_owner;\n\n    AggregatorV3Interface public priceFeed;\n\n    // constructor gets automatically run each time a contract is deployed\n    // and called?\n    constructor(address priceFeedAddress) {\n        // setting the owner to be the contract creator\n        i_owner = msg.sender;\n        priceFeed = AggregatorV3Interface(priceFeedAddress);\n    }\n\n    // \"payable\" implies that value will be sent in this function\n    function fund() public payable {\n        // \"msg.value\" is a number of wei sent in the transaction\n        // here in \"getConversionRate\" we're not passing an argument even though\n        // we've specified a parameter in the original func\n        // that is because anything that \"getConversionRate\" is being used as a\n        // method on is considered the first argument of the function\n        require(\n            msg.value.getConversionRate(priceFeed) > MINIMUM_USD,\n            \"Didn't send enough!\"\n        );\n        addressToAmountFunded[msg.sender] = msg.value;\n        // \"msg.sender\" is a globally available variable for sender's wallet address\n        funders.push(msg.sender);\n    }\n\n    function withdraw() public onlyOwner {\n        // resetting the amount sent by each funder\n        for (\n            uint256 funderIndex = 0;\n            funderIndex < funders.length;\n            funderIndex++\n        ) {\n            address funder = funders[funderIndex];\n            addressToAmountFunded[funder] = 0;\n        }\n\n        // resetting the funders array by creating a new array with 0 items\n        funders = new address[](0);\n\n        // actually withdrawing the funds. there are 3 methds:\n        // // 1. Transfer\n        // // changing the data type from address to payable address\n        // // we can only make transactions with payable address data types\n        // payable(msg.sender).transfer(address(this).balance);\n\n        // // 2. Send\n        // bool sendSuccess = payable(msg.sender).send(address(this).balance);\n        // // we have to add the \"require\" because \"send\" doesn't throw errors if\n        // // unsuccessful. instead if returns a boolean\n        // // if sendSuccess = false, throw error \"Send failed!\";\n        // require(sendSuccess, \"Send failed!\");\n\n        // 3. Call\n        // with \"call\", we can both value AND calldata \"(\"\")\"\n        (bool callSuccess, ) = payable(msg.sender).call{\n            value: address(this).balance\n        }(\"\");\n        require(callSuccess, \"Call failed!\");\n    }\n\n    // reusing code in different functions\n    modifier onlyOwner() {\n        require(msg.sender == i_owner, \"Sender is not owner!\");\n        // specifying that we want to run the function code only after\n        // checking the require condition\n        _;\n    }\n\n    // What happens if someone sends this contract ETH\n    // without calling the fund func?\n\n    receive() external payable {\n        fund();\n    }\n\n    fallback() external payable {\n        fund();\n    }\n}\n"
+    },
+    "contracts/PriceConverter.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.0;\n\n// importing code from github (as a NPM package at chainlink/contracts)\nimport \"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol\";\n\n// Libraries are similar to contracts, but you can’t declare any state\n// variable (i.e. spend gas) and you can’t send ether.\nlibrary PriceConverter {\n    // getting ETH price in USD -> interacting with outside data -> oracles\n    // Rinkeby testnet\n    // ETH/USD address: 0x8A753747A1Fa494EC906cE90E9f37563A8AF630e\n    // ABI: AggregatorV3Interface\n    function getPrice(AggregatorV3Interface priceFeed)\n        internal\n        view\n        returns (uint256)\n    {\n        // type: AggregatorV3Interface, var name: priceFeed\n        // AggregatorV3Interface priceFeed = AggregatorV3Interface(\n        //     0x8A753747A1Fa494EC906cE90E9f37563A8AF630e\n        // );\n        // \"latestRoundData\" returns 5 outputs but we only want 1\n        // that's why we put commas for outputs we don't need\n        (, int256 price, , , ) = priceFeed.latestRoundData();\n        // it returns price with 8 decimals (e.g. 2,000.00000000)\n        // that's why we have to add 10 decimals to have 18 total (convention)\n        // converting price from int256 to uint256 type\n        return uint256(price * 1e10); // 10**10\n    }\n\n    // converting specified # of ETH to USD\n    function getConversionRate(\n        uint256 ethAmount,\n        AggregatorV3Interface priceFeed\n    ) internal view returns (uint256) {\n        // getting the eth price in usd\n        uint256 ethPrice = getPrice(priceFeed);\n\n        // ethPrice -> 18 decimals, ethAmount -> 18 decimals\n        // that's why we have to divide by 18 decimals\n        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;\n\n        // still 18 decimals left. why can't we just divide by 1e36 up there?\n        return ethAmountInUsd;\n    }\n}\n"
+    },
+    "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ninterface AggregatorV3Interface {\n  function decimals() external view returns (uint8);\n\n  function description() external view returns (string memory);\n\n  function version() external view returns (uint256);\n\n  // getRoundData and latestRoundData should both raise \"No data present\"\n  // if they do not have data to report, instead of returning unset values\n  // which could be misinterpreted as actual reported values.\n  function getRoundData(uint80 _roundId)\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n\n  function latestRoundData()\n    external\n    view\n    returns (\n      uint80 roundId,\n      int256 answer,\n      uint256 startedAt,\n      uint256 updatedAt,\n      uint80 answeredInRound\n    );\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
