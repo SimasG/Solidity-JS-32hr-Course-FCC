@@ -11,3 +11,16 @@ GAS_REPORT=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.ts
 ```
+
+<!-- hardhat-simple-storage -->
+
+"devDependencies": {
+}
+
+  <!-- hardhat-fund-me -->
+
+"devDependencies": {
+"@chainlink/contracts": "^0.4.1",
+"hardhat-deploy": "^0.11.13",
+"solhint": "^3.3.7",
+}

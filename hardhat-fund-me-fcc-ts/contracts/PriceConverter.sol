@@ -6,8 +6,9 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 library PriceConverter {
     // Getting price of ETH in USD
+    // ** Libraries only get embedded into the contract if the library functions are *internal*
     function getPrice(AggregatorV3Interface priceFeed)
-        public
+        internal
         view
         returns (uint256)
     {
@@ -26,29 +27,16 @@ library PriceConverter {
         return uint256(price * 1e10);
     }
 
-    function getConversion(uint256 ethAmount, AggregatorV3Interface priceFeed)
-        public
-        view
-        returns (uint256)
-    {
+    // ** Libraries only get embedded into the contract if the library functions are *internal*
+    function getConversionRate(
+        uint256 ethAmount,
+        AggregatorV3Interface priceFeed
+    ) internal view returns (uint256) {
         uint256 ethPrice = getPrice(priceFeed);
 
         // If we multiplied "ethPrice" & "ethAmount" without dividing it by 1e18,
         // we would've received 36 0's in the result.
         uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
         return ethAmountInUsd;
-    }
-
-    // Just an example function that's using the interface
-    function getVersion() public view returns (uint256) {
-        // Initializing a variable with the type of interface we
-        // just imported. That'll allow us to use functions in that
-        // interface as methods.
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(
-            0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e
-        );
-
-        // "version()" is a func from the imported interface
-        return priceFeed.version();
     }
 }

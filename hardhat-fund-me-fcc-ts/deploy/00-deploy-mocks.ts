@@ -1,8 +1,9 @@
+// Deploying a mock contract to generate a fake ETH/USD price
 import { network } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { developmentChains, networkConfig } from "../helper-hardhat-config";
+import { developmentChains } from "../helper-hardhat-config";
 
-const DECIMALS = "18";
+const DECIMALS = "18"; // ** 8 (JS) or 18 (TS)?
 const INITIAL_PRICE = "2000000000000000000000"; // 2000
 
 // Deploying mocks for FundMe contract

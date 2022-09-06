@@ -1,4 +1,4 @@
-// ** Fix TS later
+// ** Fix "any" later
 export const networkConfig: any = {
   5: {
     name: "Goerli",

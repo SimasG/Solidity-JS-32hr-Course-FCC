@@ -1,22 +1,24 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy";
+import "dotenv/config";
 
 const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL || "";
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY || "";
 
-const config: HardhatUserConfig = {
+const config: HardhatUserConfig | any = {
   // By default, hardhat adds: "defaultNetwork: "hardhat"" behind the scenes
   defaultNetwork: "hardhat",
   networks: {
-    // ** Smth doesn't work with Goerli ("Invalid account: #0 for network: goerli - private key too short, expected 32 bytes")
-    // goerli: {
-    //   url: GOERLI_RPC_URL,
-    //   accounts: [PRIVATE_KEY!],
-    //   chainId: 5,
-    // },
+    goerli: {
+      url: GOERLI_RPC_URL,
+      accounts: [PRIVATE_KEY!],
+      chainId: 5,
+      // ** TS Why can't I adjust the "HardhatNetworkUserConfig" type to add "blockConfirmations"?
+      blockConfirmations: 6,
+    },
     localhost: {
       url: "http://127.0.0.1:8545/",
       // "accounts" array automatically set by hardhat
@@ -25,7 +27,14 @@ const config: HardhatUserConfig = {
   },
   // solidity: "0.8.8",
   solidity: {
-    compilers: [{ version: "0.8.8" }, { version: "0.6.6" }],
+    compilers: [
+      {
+        version: "0.8.8",
+      },
+      {
+        version: "0.6.6",
+      },
+    ],
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
