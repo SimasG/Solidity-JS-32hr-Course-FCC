@@ -25,7 +25,7 @@ const deployFundMe = async (hre: HardhatRuntimeEnvironment) => {
     ethUsdPriceFeedAddress = ethUsdAggregator.address;
   } else {
     // ** for *non* hardhat/localhost chains
-    ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"];
+    ethUsdPriceFeedAddress = networkConfig[network.name]["ethUsdPriceFeed"];
   }
 
   // With hardhat-deploy, we don't need to deploy a contract using a contract factory anymore
@@ -37,7 +37,7 @@ const deployFundMe = async (hre: HardhatRuntimeEnvironment) => {
     from: deployer,
     args: args, // Array of arguments being passed into the constructor
     log: true, // Enabling some automatic console logging (to avoid console logging everything manually)
-    waitConfirmations: networkConfig[network.name]?.blockConfirmations || 0,
+    waitConfirmations: networkConfig[network.name]?.blockConfirmations || 0, // Giving etherscan time to index our transaction
   });
 
   if (

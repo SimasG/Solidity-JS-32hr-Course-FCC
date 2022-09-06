@@ -2,6 +2,11 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy";
 import "dotenv/config";
+import "@typechain/hardhat";
+import "@nomiclabs/hardhat-etherscan";
+import "@nomiclabs/hardhat-ethers";
+import "hardhat-gas-reporter";
+import "solidity-coverage"; // As of 2022-09-06, it seems to be broken: https://github.com/NomicFoundation/hardhat/issues/3123
 
 const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL || "";
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
@@ -40,13 +45,13 @@ const config: HardhatUserConfig | any = {
     apiKey: ETHERSCAN_API_KEY,
   },
   gasReporter: {
-    enabled: false,
+    enabled: true,
     outputFile: "gas-report.txt",
     noColors: true,
     currency: "USD",
     // This will make an API call to coinmarketcap whenever we run the gas reporter
-    coinmarketcap: COINMARKETCAP_API_KEY,
-    // token: "MATIC", // Shows how much deploying to Polygon would cost (default is ETH mainnet)
+    // coinmarketcap: COINMARKETCAP_API_KEY,
+    token: "MATIC", // Shows how much deploying to Polygon would cost (default is ETH mainnet)
   },
   // Naming accounts in the "accounts" array for any network we're working with
   namedAccounts: {
