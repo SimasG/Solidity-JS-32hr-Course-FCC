@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Fund Me App</title>
+  </head>
+  <body>
+    <h1>Fund Me App</h1>
+    <button id="connectButton">Connect</button>
+    <button id="balanceButton">Get Balance</button>
+    <button id="withdrawButton">Withdraw</button>
+
+    <!-- Form -->
+    <label for="fund">ETH Amount</label>
+    <input id="ethAmount" type="text" placeholder="0.1" />
+
+    <button id="fundButton">Fund</button>
+
+    <!-- With TS got "Refused to execute script.. because its MIME type ('video/mp2t') is not executable" -->
+    <!-- That's why I'm using JS this time -->
+    <!-- Changing type from "text/javascript" to "module" allows us to import local files like "ethers-5.6.esm.min.js in index.js" -->
+    <!-- However, type="module" doesn't support in-HTML onclick (& other, I guess?) events -->
+    <script src="index.js" type="module"></script>
+  </body>
+</html>
