@@ -21,8 +21,6 @@ const config: HardhatUserConfig | any = {
       url: GOERLI_RPC_URL,
       accounts: [PRIVATE_KEY!],
       chainId: 5,
-      // ** TS Why can't I adjust the "HardhatNetworkUserConfig" type to add "blockConfirmations"?
-      blockConfirmations: 6,
     },
     localhost: {
       url: "http://127.0.0.1:8545/",

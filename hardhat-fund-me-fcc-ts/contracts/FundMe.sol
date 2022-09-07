@@ -22,16 +22,16 @@ contract FundMe {
     // ** i_ -> immutable variable (it won't be stored in storage (& just used directly in code execution)) -> gas cheap
 
     // 6.2. State Variables
-    mapping(address => uint256) public s_addressToAmountFunded;
-    address[] public s_funders;
+    mapping(address => uint256) private s_addressToAmountFunded;
+    address[] private s_funders;
 
     // "immutable" keyword only allows to update variable once after
     // declaring them (perfect for constructors + saves gas)
-    address public immutable i_owner;
+    address private immutable i_owner;
 
     // "constant" keyword prevents variable from being updated + saves gas
-    uint256 public constant MINIMUM_USD = 50 * 1e18;
-    AggregatorV3Interface public s_priceFeed; // "priceFeed" *CONTRACT*
+    uint256 public constant MINIMUM_USD = 50 * 1e18; // Good to leave "public" to allow others to easily see the minimum USD amount
+    AggregatorV3Interface private s_priceFeed; // "priceFeed" *interface*
 
     // 6.3. Events (none here)
 
@@ -158,5 +158,25 @@ contract FundMe {
 
     // 6.5.6. Internal Funcs (none here)
     // 6.5.7. Private Funcs (none here)
-    // 6.5.8. View/Pure Funcs (none here)
+    // 6.5.8. View/Pure Funcs
+    // ** Getters (for internal variables) -> not sure how they work
+    function getOwner() public view returns (address) {
+        return i_owner;
+    }
+
+    function getFunder(uint256 index) public view returns (address) {
+        return s_funders[index];
+    }
+
+    function getAddressToAmountFunded(address funder)
+        public
+        view
+        returns (uint256)
+    {
+        return s_addressToAmountFunded[funder];
+    }
+
+    function getPriceFeed() public view returns (AggregatorV3Interface) {
+        return s_priceFeed;
+    }
 }
