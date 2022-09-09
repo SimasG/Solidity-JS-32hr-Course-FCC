@@ -5,7 +5,7 @@
 // * We'll be relying on Chainlink a lot. Randomness (verifiable random function (VRF)), Automated Execution (Chainlink Keepers)
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol"; // This contract holds "fulfillRandomWords" func
@@ -117,6 +117,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     // us needing to interact with it
     // Transaction 1 in generating randomness (request to Chainlink)
     // "requestRandomWinner()" -> "performUpkeep()"
+    // Chainlink nodes pay gas for executing "performUpkeep()"
     function performUpkeep(
         bytes calldata /* performData */
     ) external override {
@@ -141,6 +142,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     }
 
     // Transaction 2 in generating randomness (Chainlink's response)
+    // Chainlink nodes pay gas for executing "fulfillRandomWords()"
     function fulfillRandomWords(
         uint256, /* requestId */
         uint256[] memory randomWords

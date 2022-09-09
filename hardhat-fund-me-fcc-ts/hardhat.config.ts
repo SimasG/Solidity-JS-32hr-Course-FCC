@@ -55,7 +55,7 @@ const config: HardhatUserConfig | any = {
   namedAccounts: {
     deployer: {
       default: 0, // For hardhat network, the deployer account will be "accounts[0]"
-      // 5: 1, // For Goerli testnet, the deployer account would be "accounts[0]?"
+      // 5: 1, // For Goerli testnet, the deployer account would be "accounts[1]?"
       // 31337: 2, // For localhost network, the deployer accounts would be "accounts[2]"?
     },
     user: {
