@@ -13,7 +13,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 // Ensures we implement "checkUpkeep()" & "performUpkeep()". Does it enable us running these funcs as well? I think so
 import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
 
-error Raffle__NotEnoughETHEntered();
+error Raffle__SendMoreToEnterRaffle();
 error Raffle__TransferFailed();
 error Raffle__NotOpen();
 error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
@@ -34,12 +34,13 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     /* State Variables */
     uint256 private immutable i_entranceFee;
+    uint256 private immutable i_fakePayment;
+
     address payable[] private s_players; // Making the addresses payable so we could pay the winner
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
     bytes32 private immutable i_gasLane;
     uint64 private immutable i_subscriptionId;
     uint32 private immutable i_callbackGasLimit;
-    // ** Could we decrease the var size even more (why would a constant value of 3 take 16 bits (2^16) of storage)?
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
 
@@ -62,7 +63,8 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         bytes32 gasLane, // keyHash
         uint64 subscriptionId,
         uint32 callbackGasLimit,
-        uint256 interval
+        uint256 interval,
+        uint256 fakePayment
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         i_entranceFee = entranceFee;
         // ** Is "vrfCoordinator" a contract or an interface? Patrick said contract
@@ -74,12 +76,14 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         s_raffleState = RaffleState.OPEN;
         s_lastTimeStamp = block.timestamp;
         i_interval = interval;
+        i_fakePayment = fakePayment;
     }
 
     // "public" so anyone can enter our raffle | "payable" so anyone could send funds to the contract
     function enterRaffle() public payable {
         // Storing only the error code instead of the error msg string -> more gas efficient
-        if (msg.value < i_entranceFee) revert Raffle__NotEnoughETHEntered();
+        if (msg.value < i_entranceFee) revert Raffle__SendMoreToEnterRaffle();
+
         if (s_raffleState != RaffleState.OPEN) revert Raffle__NotOpen();
         s_players.push(payable(msg.sender)); // typecasting "msg.sender" to be a payable address
 
@@ -168,6 +172,10 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
         return i_entranceFee;
     }
 
+    function getFakePayment() public view returns (uint256) {
+        return i_fakePayment;
+    }
+
     function getPlayer(uint256 index) public view returns (address) {
         return s_players[index];
     }
@@ -196,5 +204,9 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     function getRequestConfirmations() public pure returns (uint16) {
         return REQUEST_CONFIRMATIONS;
+    }
+
+    function getInterval() public view returns (uint256) {
+        return i_interval;
     }
 }

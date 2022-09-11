@@ -36,6 +36,13 @@ const config: HardhatUserConfig = {
       chainId: 31337, // Even though "localhost" network is different from "hardhat" network, chainId is same
     },
   },
+  gasReporter: {
+    enabled: false,
+    currency: "USD",
+    noColors: true,
+    outputFile: "gas-report.txt",
+    // coinmarketcap: COINMARKETCAP_API_KEY,
+  },
   solidity: "0.8.9",
   namedAccounts: {
     deployer: {
@@ -44,6 +51,9 @@ const config: HardhatUserConfig = {
     player: {
       default: 1, // For hardhat network, the deployer account will be "accounts[1]"
     },
+  },
+  mocha: {
+    timeout: 200000, // 200 seconds max
   },
 };
 

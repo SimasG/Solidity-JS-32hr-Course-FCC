@@ -41,6 +41,7 @@ import { FundMe } from "../../typechain-types";
 
       describe("fund", function () {
         it("Fails if you don't send enough ETH", async function () {
+          // Since we don't send any value ("fund()" instead of "fund({value: ...})"), transaction should fail
           await expect(fundMe.fund()).to.be.revertedWith(
             "You need to spend more ETH!"
           );

@@ -35,6 +35,7 @@ const deployRaffle = async (hre: HardhatRuntimeEnvironment) => {
     subscriptionId = networkConfig[network.config.chainId!].subscriptionId;
   }
 
+  const fakePayment = networkConfig[network.config.chainId!].fakePayment;
   const entranceFee = networkConfig[network.config.chainId!].entranceFee; // Raffle constructor argument 2
   const gasLane = networkConfig[network.config.chainId!].gasLane; // Raffle constructor argument 3
   const callbackGasLimit = networkConfig[network.config.chainId!].callbackGasLimit; // Raffle constructor argument 5
@@ -51,6 +52,7 @@ const deployRaffle = async (hre: HardhatRuntimeEnvironment) => {
     subscriptionId,
     callbackGasLimit,
     interval,
+    fakePayment,
   ];
 
   const raffle = await deploy("Raffle", {
