@@ -16,12 +16,12 @@ const deployRaffle = async (hre: HardhatRuntimeEnvironment) => {
   // (address is not even specified there since it's on a hardhat network)
   const { deployer } = await getNamedAccounts();
 
-  let VRFCoordinatorV2MockAddress; // Raffle constructor argument 1
+  let VRFCoordinatorV2Address; // Raffle constructor argument 1
   let subscriptionId; // Raffle constructor argument 4
 
   if (developmentChains.includes(network.name)) {
     const VRFCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock");
-    VRFCoordinatorV2MockAddress = VRFCoordinatorV2Mock.address;
+    VRFCoordinatorV2Address = VRFCoordinatorV2Mock.address;
 
     // Creating a fake VRF subscription (using "VRFCoordinatorV2Mock")
     const transactionResponse = await VRFCoordinatorV2Mock.createSubscription();
@@ -31,7 +31,7 @@ const deployRaffle = async (hre: HardhatRuntimeEnvironment) => {
     // Funding the subscription -> "VRFCoordinatorV2Mock" lets us fund it without LINK
     await VRFCoordinatorV2Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT);
   } else {
-    VRFCoordinatorV2MockAddress = networkConfig[network.config.chainId!].vrfCoordinatorV2;
+    VRFCoordinatorV2Address = networkConfig[network.config.chainId!].vrfCoordinatorV2;
     subscriptionId = networkConfig[network.config.chainId!].subscriptionId;
   }
 
@@ -46,7 +46,7 @@ const deployRaffle = async (hre: HardhatRuntimeEnvironment) => {
     : VERIFICATION_BLOCK_CONFIRMATIONS;
 
   const args = [
-    VRFCoordinatorV2MockAddress,
+    VRFCoordinatorV2Address,
     entranceFee,
     gasLane,
     subscriptionId,

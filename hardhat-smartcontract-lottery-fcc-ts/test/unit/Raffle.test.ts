@@ -219,6 +219,7 @@ import { Raffle, VRFCoordinatorV2Mock } from "../../typechain-types";
 
                 resolve();
               } catch (error) {
+                console.log(error);
                 reject(error);
               }
             });

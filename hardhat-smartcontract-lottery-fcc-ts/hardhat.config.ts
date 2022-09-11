@@ -36,12 +36,16 @@ const config: HardhatUserConfig = {
       chainId: 31337, // Even though "localhost" network is different from "hardhat" network, chainId is same
     },
   },
+  etherscan: {
+    // npx hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
+    apiKey: ETHERSCAN_API_KEY,
+  },
   gasReporter: {
-    enabled: false,
+    enabled: true,
     currency: "USD",
     noColors: true,
     outputFile: "gas-report.txt",
-    // coinmarketcap: COINMARKETCAP_API_KEY,
+    coinmarketcap: COINMARKETCAP_API_KEY,
   },
   solidity: "0.8.9",
   namedAccounts: {
