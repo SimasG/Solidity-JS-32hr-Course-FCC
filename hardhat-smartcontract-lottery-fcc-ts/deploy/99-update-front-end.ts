@@ -7,8 +7,8 @@ import { DeployFunction } from "hardhat-deploy/dist/types";
 import fs from "fs-extra";
 
 const FRONT_END_ADDRESSES_FILE =
-  "../nextjs-smartcontract-lottery-fcc-ts/constants/contractAddresses.json";
-const FRONT_END_ABI_FILE = "../nextjs-smartcontract-lottery-fcc-ts/constants/abi.json";
+  "../../Projects/nextjs-smartcontract-lottery-fcc-ts/constants/contractAddresses.json";
+const FRONT_END_ABI_FILE = "../../Projects/nextjs-smartcontract-lottery-fcc-ts/constants/abi.json";
 
 const updateUI: DeployFunction = async () => {
   // ** Don't understand this "if"
