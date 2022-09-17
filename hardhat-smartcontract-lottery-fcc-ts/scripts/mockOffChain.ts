@@ -1,5 +1,4 @@
 // ** Don't understand this script well
-
 import { BigNumber } from "ethers";
 import { ethers, network } from "hardhat";
 import { Raffle, VRFCoordinatorV2Mock } from "../typechain-types";

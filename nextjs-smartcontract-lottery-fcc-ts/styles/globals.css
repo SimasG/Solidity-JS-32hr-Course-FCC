@@ -3,3 +3,10 @@
 @tailwind utilities;
 
 /* Global rules */
+
+/* Global rules */
+html,
+body {
+  height: 100%;
+  padding: 5px;
+}

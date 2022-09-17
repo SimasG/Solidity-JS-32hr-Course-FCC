@@ -5,7 +5,11 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 // Inheriting ERC721 contract (JS classes version: "class BasicNft extends ERC721")
 contract BasicNft is ERC721 {
-    string public constant TOKEN_URI = "ipfs://bafybeig37ioir76s7mg5oobetncojcm3c3hxasyd4rvid4jqhy4gkaheg4/?filename=0-PUG.json";
+    // Making URI constant -> a bunch of identical NFTs will be minted
+    string public constant TOKEN_URI =
+        "ipfs://QmeBV6jAYCaZibyWo9E67oFUh8UuCdDUKFM1HPBQx1dgRL";
+    // string public constant TOKEN_URI =
+    //     "ipfs://bafybeig37ioir76s7mg5oobetncojcm3c3hxasyd4rvid4jqhy4gkaheg4/?filename=0-PUG.json";
     uint256 private s_tokenCounter;
 
     // Arg 1: NFT name | Arg 2: NFT symbol
@@ -19,9 +23,23 @@ contract BasicNft is ERC721 {
         _safeMint(msg.sender, s_tokenCounter);
         s_tokenCounter = s_tokenCounter + 1;
         return s_tokenCounter;
-    };
+    }
+
+    function tokenURI(
+        uint256 /* tokenId */
+    )
+        public
+        pure
+        override
+        returns (
+            // Trying "pure" instead of "view"
+            string memory
+        )
+    {
+        return TOKEN_URI;
+    }
 
     function getTokenCounter() public view returns (uint256) {
         return s_tokenCounter;
     }
-};
+}

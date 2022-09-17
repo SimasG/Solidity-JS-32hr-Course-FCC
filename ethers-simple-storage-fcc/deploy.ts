@@ -80,7 +80,7 @@ async function main() {
   console.log(`New Favorite Number: ${newFavoriteNumber}`);
 }
 
-// ** What does "process.exit" really mean?
+// process.exit() terminates our nodejs application. 0 (default) -> success. 1 -> Uncaught Fatal Exception, etc. etc.
 main()
   .then(() => process.exit(0))
   .catch((error) => {

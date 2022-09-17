@@ -53,7 +53,7 @@ const config: HardhatUserConfig = {
       default: 0, // For hardhat network, the deployer account will be "accounts[0]"
     },
     player: {
-      default: 1, // For hardhat network, the deployer account will be "accounts[1]"
+      default: 1, // For hardhat network, the player account will be "accounts[1]"
     },
   },
   mocha: {
